@@ -26,11 +26,17 @@
             var TAX = 0.083;
             var TIP = 0.1;
             var getLimit = function() { return BUDGET/(1 + TAX)/(1 + TIP); }
+            var getCost = function(amount) { return BUDGET -  (amount * (1 + TAX) * (1 + TIP)); }
 
             $('em').each(function() {
-                var t = $(this), $limit = getLimit(), $pos = t.text().indexOf("$");
-                if ($pos > -1 && parseFloat(t.text().substring($pos + 1)) > $limit) {
-                    t.parent().parent().fadeTo(1, 0.5);
+                var t = $(this), $pos = t.text().indexOf("$");
+                if ($pos > -1) {
+                    var amount = parseFloat(t.text().substring($pos + 1));
+                    var cost = getCost(amount);
+                    if (cost < 0) {
+                        t.parent().parent().fadeTo(1, 0.5);
+                        t.append('<span style="padding-left: 2em;">+$' + (-1 * cost).toFixed(2) + '</span>');
+                    }
                 }
             });
         })(jQuery.noConflict());
