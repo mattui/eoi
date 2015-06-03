@@ -20,14 +20,35 @@
         document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-    loadScript("http://code.jquery.com/jquery-2.1.4.min.js", function () {
-        (function($) {
-            var BUDGET = 15.00;
-            var TAX = 0.083;
-            var TIP = 0.1;
-            var getLimit = function() { return BUDGET/(1 + TAX)/(1 + TIP); }
-            var getCost = function(amount) { return BUDGET -  (amount * (1 + TAX) * (1 + TIP)); }
+    (function($) {
+        var $BUDGET = 15.00;
+        var $TAX = 0.083;
+        var $TIP = 0.1;
 
+        var getLimit = function() { return $BUDGET/(1 + $TAX)/(1 + $TIP); }
+        var isCartEmpty = $('#total').length == 0;
+
+        /*
+        var timer = setInterval(function() {
+            if (!isCartEmpty()) console.log('cart not empty');
+        }, 500);
+        */
+
+        var changing = false;
+
+        $('#cart').bind('DOMSubtreeModified', function(e) {
+            if (!changing) {
+                requestAnimationFrame(function() {
+                    isCartEmpty = $('#total').length == 0;
+                    console.log('CHANGE!', isCartEmpty);
+                    changing = false;
+                });
+            }
+            changing = true;
+        });
+
+        var updateBudget = function() {
+            var getCost = function(amount) { return budget - (amount * (1 + $TAX) * (1 + $TIP)); }
             $('em').each(function() {
                 var t = $(this), $pos = t.text().indexOf("$");
                 if ($pos > -1) {
@@ -39,6 +60,8 @@
                     }
                 }
             });
-        })(jQuery.noConflict());
-    });
+        }
+
+        updateBudget();
+    })(jQuery.sub());
 })();
