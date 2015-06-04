@@ -28,12 +28,6 @@
         var getLimit = function() { return $BUDGET/(1 + $TAX)/(1 + $TIP); }
         var isCartEmpty = $('#total').length == 0;
 
-        /*
-        var timer = setInterval(function() {
-            if (!isCartEmpty()) console.log('cart not empty');
-        }, 500);
-        */
-
         var changing = false;
 
         $('#cart').bind('DOMSubtreeModified', function(e) {
@@ -41,6 +35,7 @@
                 requestAnimationFrame(function() {
                     isCartEmpty = $('#total').length == 0;
                     console.log('CHANGE!', isCartEmpty);
+                    updateBudget();
                     changing = false;
                 });
             }
@@ -48,18 +43,50 @@
         });
 
         var updateBudget = function() {
+            var budget = (function() {
+                if (isCartEmpty) return $BUDGET;
+
+                var totalText = $(":contains('Grand Total')").children('span').text();
+                var amount = parseFloat(totalText.substring(totalText.indexOf("$") + 1));
+                console.log("Grand Total", amount);
+                return $BUDGET - amount;
+            })();
             var getCost = function(amount) { return budget - (amount * (1 + $TAX) * (1 + $TIP)); }
-            $('em').each(function() {
-                var t = $(this), $pos = t.text().indexOf("$");
-                if ($pos > -1) {
-                    var amount = parseFloat(t.text().substring($pos + 1));
-                    var cost = getCost(amount);
-                    if (cost < 0) {
-                        t.parent().parent().fadeTo(1, 0.5);
-                        t.append('<span style="padding-left: 2em;">+$' + (-1 * cost).toFixed(2) + '</span>');
+            $('em')
+                //.fadeIn(0)
+                .each(function() {
+                    var t = $(this), $pos = t.text().indexOf("$");
+                    t.find('.costDetails').remove();
+                    if ($pos > -1) {
+                        var amount = parseFloat(t.text().substring($pos + 1));
+                        var cost = getCost(amount);
+                        var formattedCost = Math.abs((cost).toFixed(2));
+                        var dpos = formattedCost.toString().indexOf('.');
+                        if (dpos == -1) {
+                            formattedCost += '.00';
+                        }
+                        else if (formattedCost.toString().length - dpos < 3) {
+                            formattedCost += '0';
+                        }
+
+                        t
+                            .css('text-align', 'right')
+                            .parent()
+                            .css('height', '3em')
+                            .css('background-color', cost < 0 ? 'rgba(256,0,0,0.1)' : 'rgba(0,256,0,0.1)')
+                            .css('border', cost < 0 ? '1px solid red' : '1px solid green');
+
+                        var details = 'extra';
+                        if (cost < 0) {
+                            details = 'over'
+                        }
+                        t.append('<div class="costDetails">'
+                                + details
+                                + " $"
+                                + formattedCost
+                                + '</div>');
                     }
-                }
-            });
+                });
         }
 
         updateBudget();
