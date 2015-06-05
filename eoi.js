@@ -43,31 +43,41 @@
         });
 
         var updateBudget = function() {
+            var formatDollars = function(dollars) {
+                var dpos = dollars.toString().indexOf('.');
+                if (dpos == -1) {
+                    return dollars + '.00';
+                }
+                else if (dollars.toString().length - dpos < 3) {
+                    return dollars + '0';
+                }
+                return dollars;
+            };
             var budget = (function() {
                 if (isCartEmpty) return $BUDGET;
 
-                var totalText = $(":contains('Grand Total')").children('span').text();
+                var total = $(":contains('Grand Total')");
+                var totalText = total.children('span').text();
                 var amount = parseFloat(totalText.substring(totalText.indexOf("$") + 1));
                 console.log("Grand Total", amount);
+                var over = '$' + (amount > $BUDGET ? formatDollars(Math.abs($BUDGET - amount)) : formatDollars(0));
+                changing = true;
+                total.parent().parent().append("<p><strong>You Pay<span>" + over + "</span></strong></p>");
+                changing = false;
+                console.log("You Pay", over);
                 return $BUDGET - amount;
             })();
+
             var getCost = function(amount) { return budget - (amount * (1 + $TAX) * (1 + $TIP)); }
+
             $('em')
-                //.fadeIn(0)
                 .each(function() {
                     var t = $(this), $pos = t.text().indexOf("$");
                     t.find('.costDetails').remove();
                     if ($pos > -1) {
                         var amount = parseFloat(t.text().substring($pos + 1));
                         var cost = getCost(amount);
-                        var formattedCost = Math.abs((cost).toFixed(2));
-                        var dpos = formattedCost.toString().indexOf('.');
-                        if (dpos == -1) {
-                            formattedCost += '.00';
-                        }
-                        else if (formattedCost.toString().length - dpos < 3) {
-                            formattedCost += '0';
-                        }
+                        var formattedCost = formatDollars(Math.abs((cost).toFixed(2)));
 
                         t
                             .css('text-align', 'right')
