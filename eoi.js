@@ -126,5 +126,5 @@
         }
 
         updateBudget();
-    })(jQuery.sub());
+    })(jQuery);
 })();
