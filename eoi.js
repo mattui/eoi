@@ -21,9 +21,9 @@
     }
 
     (function($) {
-        var $BUDGET = 15.00;
-        var $TAX = 0.083;
-        var $TIP = 0.1;
+        var $BUDGET = parseFloat(prompt("Please enter your budget", "12.00")) || 12.00;
+        var $TAX = parseFloat(prompt("Please enter your tax rate", "0.0825")) || 0.0825;
+        var $TIP = parseFloat(prompt("Please enter your tip percentage", "0.1")) || 0.1;
 
         var isCartEmpty = $('#total').length == 0;
         var getTip = function() {
