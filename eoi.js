@@ -21,6 +21,10 @@
     }
 
     (function($) {
+        var $TITLE = $('title').text();
+        var $YELP = 'https://www.yelp.com/search?find_desc=' + encodeURI($TITLE);
+        $('h1').prepend('<a href="' + $YELP + '" target="_blank" style="position: inherit; left: inherit; top: inherit; font-size: inherit; display: inherit; white-space: inherit; float: left;"><img src="https://c1.staticflickr.com/6/5180/5540543936_423e37dae4_b.jpg" style="width: 1em; height: 1em; margin-right: 0.3em; vertical-align: -0.1em;"></a>');
+
         var $BUDGET = parseFloat(prompt("Please enter your budget", "12.00")) || 12.00;
         var $TAX = parseFloat(prompt("Please enter your tax rate", "0.0825")) || 0.0825;
         var $TIP = parseFloat(prompt("Please enter your tip percentage", "0.1")) || 0.1;
